@@ -7,6 +7,7 @@ import com.haiilo.checkout.core.domain.exception.ItemPriceNotFoundException;
 import com.haiilo.checkout.core.domain.model.LineItem;
 import com.haiilo.checkout.core.domain.model.PriceOffer;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -14,10 +15,12 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class PriceCalculationServiceImpl implements PriceCalculationService {
 
     private final PriceRepository priceRepository;
@@ -36,7 +39,7 @@ public class PriceCalculationServiceImpl implements PriceCalculationService {
             List<LineItem> lineItems = itemGroups.get(itemName);
             totalPrice = totalPrice.add(calculateTotalPriceForItemGroup(lineItems, itemPrice));
         }
-        return totalPrice;
+        return totalPrice.setScale(2, RoundingMode.HALF_UP);
     }
 
     private Map<String, List<LineItem>> groupCartItemsByName(List<LineItem> items) {
@@ -55,7 +58,7 @@ public class PriceCalculationServiceImpl implements PriceCalculationService {
     private BigDecimal calculateTotalPriceForItemGroup(List<LineItem> items, Price price) {
         int totalQuantity = items.stream().mapToInt(LineItem::quantity).sum();
         BigDecimal unitPrice = price.getPrice();
-        if (price.getOffer() == null) {
+        if (price.getOffer() == null || price.getOffer().isEmpty()) {
             return unitPrice.multiply(BigDecimal.valueOf(totalQuantity));
         }
 
