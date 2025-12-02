@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PriceRepository extends JpaRepository<Price, Long> {
 
-    List<Price> findAllByIgnoreCaseCodeIn(Collection<String> itemNames);
+    List<Price> findAllByCodeIn(Collection<String> itemNames);
 }

@@ -11,6 +11,7 @@ import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,12 +50,12 @@ public class PriceCalculationServiceImpl implements PriceCalculationService {
     }
 
     private Map<String, Price> fetchPricesForItemByNames(Collection<String> itemNames) {
-        return priceRepository.findAllByIgnoreCaseCodeIn(itemNames).stream()
+        return priceRepository.findAllByCodeIn(itemNames).stream()
             .collect(Collectors.toMap(
-                price -> price.getCode().toLowerCase(),
-                price -> price)
+                Price::getCode, Function.identity())
             );
     }
+
     private BigDecimal calculateTotalPriceForItemGroup(List<LineItem> items, Price price) {
         int totalQuantity = items.stream().mapToInt(LineItem::quantity).sum();
         BigDecimal unitPrice = price.getPrice();

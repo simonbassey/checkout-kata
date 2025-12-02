@@ -1,10 +1,15 @@
 package com.haiilo.checkout.core.domain.entity;
 
+import com.haiilo.checkout.core.domain.exception.InvalidPriceOfferFormatException;
+import com.haiilo.checkout.core.domain.model.Constants;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -13,7 +18,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "prices")
+@Table(name = "prices", indexes = {
+    @Index(name = "IX_price_item_code", columnList = "item_code", unique = true)
+})
 @Getter
 @Setter
 public class Price {
@@ -32,4 +39,15 @@ public class Price {
     private BigDecimal price;
 
     private String offer;
+
+    @PrePersist
+    @PreUpdate
+    private void normalizeItemCodeAndValidatePriceOffer() {
+        if (code != null) {
+            code = code.trim().toLowerCase();
+        }
+        if (offer != null && !Constants.VALID_PRICE_OFFER.matcher(offer).matches()) {
+            throw new InvalidPriceOfferFormatException(offer);
+        }
+    }
 }
