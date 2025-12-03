@@ -17,3 +17,14 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
+
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /checkout-svc/openapi/v3/api-docs
+  paths-to-match: /**
+  swagger-ui:
+    use-root-path: true
+    path: /checkout-svc/openapi/swagger-ui.html
+  packages-to-scan: com.haiilo.checkout

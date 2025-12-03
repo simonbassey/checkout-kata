@@ -1,5 +1,7 @@
 package com.haiilo.checkout.core.service;
 
+import static java.util.function.Function.identity;
+
 import com.haiilo.checkout.core.abstraction.repository.PriceRepository;
 import com.haiilo.checkout.core.abstraction.service.PriceCalculationService;
 import com.haiilo.checkout.core.domain.entity.Price;
@@ -11,7 +13,6 @@ import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +53,7 @@ public class PriceCalculationServiceImpl implements PriceCalculationService {
     private Map<String, Price> fetchPricesForItemByNames(Collection<String> itemNames) {
         return priceRepository.findAllByCodeIn(itemNames).stream()
             .collect(Collectors.toMap(
-                Price::getCode, Function.identity())
+                price -> price.getCode().toLowerCase(), identity())
             );
     }
 

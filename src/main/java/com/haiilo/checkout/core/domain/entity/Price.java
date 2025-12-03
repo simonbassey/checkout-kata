@@ -46,7 +46,7 @@ public class Price {
         if (code != null) {
             code = code.trim().toLowerCase();
         }
-        if (offer != null && !Constants.VALID_PRICE_OFFER.matcher(offer).matches()) {
+        if (offer != null && !offer.isBlank() && !Constants.VALID_PRICE_OFFER.matcher(offer).matches()) {
             throw new InvalidPriceOfferFormatException(offer);
         }
     }
